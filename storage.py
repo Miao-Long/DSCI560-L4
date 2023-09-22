@@ -19,7 +19,7 @@ class RedditStorage:
         self.select_query = """SELECT * FROM RedditPosts;"""
         self.posts_table_query = """
             CREATE TABLE IF NOT EXISTS RedditPosts (
-                ID INT PRIMARY KEY AUTO_INCREMENT,  
+                ID VARCHAR(255) PRIMARY KEY,  
                 Title VARCHAR(1023),  
                 post_text TEXT,      
                 Post_URL VARCHAR(1023), 
@@ -65,11 +65,18 @@ class RedditStorage:
                 
                 for row in csv_reader:
                     try:
+                        # Execute the SQL statement
                         insert_query = f"""
-                        INSERT INTO {table_name} (Title, post_text, Post_URL, Total_Comments, Score)
-                        VALUES (%s, %s, %s, %s, %s)
+                            INSERT INTO {table_name} (ID, Title, post_text, Post_URL, Total_Comments, Score)
+                            VALUES (%s, %s, %s, %s, %s, %s)
+                            ON DUPLICATE KEY UPDATE
+                            Title = VALUES(Title),
+                            post_text = VALUES(post_text),
+                            Post_URL = VALUES(Post_URL),
+                            Total_Comments = VALUES(Total_Comments),
+                            Score = VALUES(Score)
                         """
-                        self.cursor.execute(insert_query, tuple(row[1:]))
+                        self.cursor.execute(insert_query, tuple(row))
                         self.connection.commit()
                     except mysql.connector.Error as err:
                         print(row)
@@ -79,8 +86,6 @@ class RedditStorage:
     def print_table(self):
         self.cursor.execute(self.select_query)
 
-    def table_def(self):
-        pass
 
 if __name__ == "__main__":
     host = "localhost"
