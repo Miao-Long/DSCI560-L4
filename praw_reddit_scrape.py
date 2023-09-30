@@ -39,7 +39,11 @@ batch_size = 1000
 # Fetching posts in batches
 for _ in range(0, input_posts, batch_size):
     try:
-        print('Fetching data.....')
+        print("""
+###########################
+# Python Reddit Scraping  #
+###########################
+        """)
         batch = subreddit.top(limit=batch_size)
         posts.extend(batch)
     except:
@@ -86,7 +90,6 @@ dataframe_reddit_praw.to_csv('Praw_reddit_data.csv',index=False)
 
 print('Done')
 
-
 print("""
 #########################
 # MySQL Reddit Storage  #
@@ -94,10 +97,11 @@ print("""
 """)
 
 #storage credentials
-host = "localhost"
-user = "root"
+host = getpass.getpass("Enter your MySQL host: ")
+user = getpass.getpass("Enter your MySQL user: ")
 password = getpass.getpass("Enter your MySQL password: ")
-database="dsci560_lab4"
+database=getpass.getpass("Enter an existing MySQL Database: ")
+#TODO: update
 
 database = storage.RedditStorage(
         host=host,
@@ -106,4 +110,5 @@ database = storage.RedditStorage(
         database=database,
     )
 
-database.readin_csv("cleaned_data.csv", "RedditPosts")
+if database.readin_csv("Praw_reddit_data.csv", "RedditPosts"):
+    print("Finished committing data to storage")

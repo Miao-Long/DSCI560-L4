@@ -7,7 +7,7 @@ import datetime
 # Get the current date
 
 class RedditStorage:
-    def __init__(self, host, user, password, database) -> None:
+    def __init__(self, host, user, password, database, update_interval) -> None:
         self.host = host
         self.user = user
         self.password = password
@@ -81,7 +81,8 @@ class RedditStorage:
                     except mysql.connector.Error as err:
                         print(row)
                         print(f"Error: {err}")
-                        return None
+                        return False
+        return True
 
     def print_table(self):
         self.cursor.execute(self.select_query)
